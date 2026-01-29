@@ -4,6 +4,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "py -3 -m app.main",
+    "build": "py -3 -m pip install -r requirements.txt",
+    "start": "py -3 -m gunicorn app.main:app --bind 0.0.0.0:5000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
