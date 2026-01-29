@@ -1,37 +1,30 @@
-from fastapi import FastAPI
-from .routes.api import router
-from .middleware.logging import LoggingMiddleware
-from fastapi.middleware.cors import CORSMiddleware
+from flask import Flask, jsonify
+from flask_cors import CORS
+from .routes.api import api_bp
 import os
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(
-    title=os.getenv("APP_NAME", "FastAPI Backend"),
-    version=os.getenv("API_VERSION", "v1")
+app = Flask(
+    __name__,
+    instance_relative_config=True
 )
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
-)
+# Add CORS support
+CORS(app)
 
-# Add logging middleware
-app.add_middleware(LoggingMiddleware)
+# Register blueprints
+app.register_blueprint(api_bp, url_prefix="/api")
 
-# Include routes
-app.include_router(router, prefix="/api")
-
-@app.get("/")
+@app.route("/")
 def read_root():
-    return {
-        "message": "Hello World from FastAPI!",
-        "app_name": os.getenv("APP_NAME", "FastAPI Backend"),
+    return jsonify({
+        "message": "Hello World from Flask!",
+        "app_name": os.getenv("APP_NAME", "Flask Backend"),
         "version": os.getenv("API_VERSION", "v1")
-    } 
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000) 
